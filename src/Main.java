@@ -3,11 +3,13 @@
  */
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args){
-
+        Radix test = new Radix();
+        String testString = test.sort();
     }
 }
 
@@ -229,7 +231,7 @@ class Queue {
 
 /** Radix
  *      Takes in data from input file, performs Radix sort and outputs sorted data as String
- *      TODO: Figure out how to read file
+ *      TODO: Figure out how to set up data for Radix, build test
  */
 class Radix {
     String fileName = "years.txt";
@@ -239,17 +241,23 @@ class Radix {
         Integer numKeyDigits = 0;
         Integer numItems = 0;
 
-
         File file = new File(fileName);
         Scanner sc = new Scanner(file);
 
-        sc.useDelimiter("\n");
+        numKeyDigits = Integer.parseInt(sc.nextLine());
+        System.out.println("Key Digit Length: " + numKeyDigits);
+        Queue[][] buckets = new Queue[9][numKeyDigits];
 
-        numKeyDigits = Integer.parseInt(sc.next());
-        numItems = Integer.parseInt(sc.next());
+        numItems = Integer.parseInt(sc.nextLine());
+        System.out.println("Number of items: " + numItems);
+        Entry[] unsortedData = new Entry[numItems];
 
-        sc.useDelimiter(", ");
-        
+        for(int i = 0; i < numItems; i++) {
+            unsortedData[i].key = sc.next();
+            unsortedData[i].value = sc.next();
+        }
+
+        System.out.print(Arrays.toString(unsortedData));
 
         return sortedString;
     }
