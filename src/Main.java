@@ -7,9 +7,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) throws FileNotFoundException {
         Radix test = new Radix();
-        String testString = test.sort();
+        test.getData("years.txt");
+
     }
 }
 
@@ -19,6 +20,23 @@ public class Main {
 class Entry {
     public String key;
     public String value;
+
+    public Entry() {
+        this.key = "";
+        this.value = "";
+    }
+    public Entry(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }
 
 /** Node Class
@@ -231,34 +249,47 @@ class Queue {
 
 /** Radix
  *      Takes in data from input file, performs Radix sort and outputs sorted data as String
- *      TODO: Figure out how to set up data for Radix, build test
+ *      TODO: Start sorting algorithm
  */
 class Radix {
-    String fileName = "years.txt";
+    Integer numKeyDigits = 0;
+    Integer numItems = 0;
+    Entry[] entries;
+    Queue[][] buckets;
 
-    String sort(String fileName) throws FileNotFoundException{
+    String sort(Entry[] unsortedData){
+        String sortedData = "";
+
+
+
+        return sortedData;
+    }
+
+    Entry[] getData(String fileName) throws FileNotFoundException{
         String sortedString = "";
         Integer numKeyDigits = 0;
         Integer numItems = 0;
 
         File file = new File(fileName);
         Scanner sc = new Scanner(file);
+        sc.useDelimiter(",");
 
         numKeyDigits = Integer.parseInt(sc.nextLine());
         System.out.println("Key Digit Length: " + numKeyDigits);
-        Queue[][] buckets = new Queue[9][numKeyDigits];
+        Queue[][] buckets = new Queue[10][numKeyDigits];
 
         numItems = Integer.parseInt(sc.nextLine());
         System.out.println("Number of items: " + numItems);
         Entry[] unsortedData = new Entry[numItems];
 
         for(int i = 0; i < numItems; i++) {
-            unsortedData[i].key = sc.next();
-            unsortedData[i].value = sc.next();
+            String key = sc.next();
+            String value = sc.nextLine().substring(1);
+
+            unsortedData[i] = new Entry(key, value);
+            System.out.print(unsortedData[i].key + " - " + unsortedData[i].value + "\n");
         }
 
-        System.out.print(Arrays.toString(unsortedData));
-
-        return sortedString;
+        return unsortedData;
     }
 }
