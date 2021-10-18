@@ -9,7 +9,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         Radix test = new Radix();
-        test.getData("years.txt");
+
+        test.sort("zipcodes.txt");
 
     }
 }
@@ -79,7 +80,7 @@ class Node {
 class LinkedList {
     private Node head;
     private Node tail;
-    private Node pool = new Node(0);            //TODO: Remove value assignment after testing
+    private Node pool = new Node();
     private Integer poolSize = 1;
     final Integer poolMax = 9;
 
@@ -87,7 +88,7 @@ class LinkedList {
     public LinkedList(){
         Node poolIndex = pool;
         for(int i = 1; i < 10; i++) {                       //starts at 1 because there is already a node made...
-            poolIndex.setNext(new Node(i));                   //TODO: Remove value assignment after testing
+            poolIndex.setNext(new Node());
             poolIndex = poolIndex.getNext();
             poolSize++;
         }
@@ -95,7 +96,7 @@ class LinkedList {
     public LinkedList(Object item) {
         Node poolIndex = pool;
         for(int i = 1; i <= 10; i++) {                       //starts at 1 because there is already a node made...
-            poolIndex.setNext(new Node(i));                   //TODO: Remove value assignment after testing
+            poolIndex.setNext(new Node());
             poolIndex = poolIndex.getNext();
             poolSize = i;
         }
@@ -159,30 +160,22 @@ class LinkedList {
 
     void addPool(Node add) {
         if(poolSize <= poolMax) {
-            if(pool == null) {                          //TODO: Replace if/else statement with making value null after testing
-                add.setValue(9);
-            } else {
-                add.setValue((Integer) pool.getValue() - 1);
-            }
+            add.setValue(null);
             add.setNext(pool);
             pool = add;
             poolSize++;
-            System.out.println("Added node " + pool.getValue() +" to pool");        //TODO: Remove after testing
             return;
         }
         add.setNext(null);
         add.setValue(null);
-        System.out.println("Pool at maximum capacity - feeding node to garbage collector");     //TODO: Remove after testing
     }
 
     Node removePool() {
         if(poolSize == 0) {
-            System.out.println("Pool exhausted - making new node");             //TODO: Remove after testing
             return new Node();
         }
         else {
             Node returnNode = pool;
-            System.out.println("Removed node " + pool.getValue() + " from pool");       //TODO: Remove after testing
             pool = pool.getNext();
             poolSize--;
             return returnNode;
@@ -249,16 +242,49 @@ class Queue {
 
 /** Radix
  *      Takes in data from input file, performs Radix sort and outputs sorted data as String
- *      TODO: Start sorting algorithm
+ *      TODO: Clean up code. Make test ouput prettier and move to main.
  */
 class Radix {
     Integer numKeyDigits = 0;
     Integer numItems = 0;
     Entry[] entries;
-    Queue[][] buckets;
+    Queue[] buckets = new Queue[10];
 
-    String sort(Entry[] unsortedData){
-        String sortedData = "";
+    Entry[] sort(String filename) throws FileNotFoundException {
+        Entry[] sortedData = new Entry[numItems];
+        Entry[] unsortedData = getData(filename);
+
+        for(int i = 1; i <= numKeyDigits; i ++) {
+            System.out.println("Pass " + i + ":");
+            for(Entry entry : unsortedData) {
+                Integer keyNum = Character.getNumericValue(entry.key.charAt(entry.key.length() - i));
+                if(buckets[keyNum] == null) {
+                    buckets[keyNum] = new Queue();
+                }
+                buckets[keyNum].enqueue(entry);
+            }
+
+            unsortedData = new Entry[numItems];                         //Get array ready to be populated again
+
+            for(int j = 0; j < numItems; j++) {
+                for(int k = 0; k < 10; k ++) {
+                    while(buckets[k] == null) {                         //Throws error if it tries to access a null
+                        k++;                                            //array, this will skip that bug if needed
+                        if (k > 9) {
+                            break;
+                        }
+                    }
+                    while(!buckets[k].isEmpty()) {
+                        unsortedData[j] = buckets[k].dequeue();
+                        j++;
+                    }
+                }
+            }
+            for(Entry entry: unsortedData) {
+                System.out.println(entry.key);
+            }
+        }
+
 
 
 
@@ -267,8 +293,6 @@ class Radix {
 
     Entry[] getData(String fileName) throws FileNotFoundException{
         String sortedString = "";
-        Integer numKeyDigits = 0;
-        Integer numItems = 0;
 
         File file = new File(fileName);
         Scanner sc = new Scanner(file);
@@ -276,7 +300,6 @@ class Radix {
 
         numKeyDigits = Integer.parseInt(sc.nextLine());
         System.out.println("Key Digit Length: " + numKeyDigits);
-        Queue[][] buckets = new Queue[10][numKeyDigits];
 
         numItems = Integer.parseInt(sc.nextLine());
         System.out.println("Number of items: " + numItems);
