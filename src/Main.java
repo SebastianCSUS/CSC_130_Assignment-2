@@ -1,16 +1,19 @@
-/** Assignment 2 - Radix Sort - 10/19/2021
+/** Assignment 2 - Radix Sort - 10/20/2021
  *  Sebastian Jones - Sacramento State University - CSC 130 - Professor Cooke
  */
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         Radix test = new Radix();
 
-        test.sort("zipcodes.txt");
+        Entry[] sortedData = test.sort("areacode.txt");
+
+        for(Entry entry : sortedData) {
+            System.out.println(entry.key + " - " + entry.value);
+        }
 
     }
 }
@@ -242,21 +245,18 @@ class Queue {
 
 /** Radix
  *      Takes in data from input file, performs Radix sort and outputs sorted data as String
- *      TODO: Clean up code. Make test ouput prettier and move to main.
+ *
  */
 class Radix {
     Integer numKeyDigits = 0;
     Integer numItems = 0;
-    Entry[] entries;
     Queue[] buckets = new Queue[10];
 
     Entry[] sort(String filename) throws FileNotFoundException {
-        Entry[] sortedData = new Entry[numItems];
-        Entry[] unsortedData = getData(filename);
+        Entry[] dataSet = getData(filename);
 
         for(int i = 1; i <= numKeyDigits; i ++) {
-            System.out.println("Pass " + i + ":");
-            for(Entry entry : unsortedData) {
+            for(Entry entry : dataSet) {
                 Integer keyNum = Character.getNumericValue(entry.key.charAt(entry.key.length() - i));
                 if(buckets[keyNum] == null) {
                     buckets[keyNum] = new Queue();
@@ -264,31 +264,26 @@ class Radix {
                 buckets[keyNum].enqueue(entry);
             }
 
-            unsortedData = new Entry[numItems];                         //Get array ready to be populated again
+            dataSet = new Entry[numItems];                         //Wipe array to get ready for repopulation
 
-            for(int j = 0; j < numItems; j++) {
-                for(int k = 0; k < 10; k ++) {
-                    while(buckets[k] == null) {                         //Throws error if it tries to access a null
-                        k++;                                            //array, this will skip that bug if needed
+            for(int j = 0; j < numItems; j++) {                     //Keeps track of next free spot in array
+                for(int k = 0; k < buckets.length; k ++) {          //Keeps track of buckets
+                    while(buckets[k] == null) {                         //Throws error if it tries to access an empty
+                        k++;                                            //bucket, this will bypass that bug
                         if (k > 9) {
                             break;
                         }
                     }
-                    while(!buckets[k].isEmpty()) {
-                        unsortedData[j] = buckets[k].dequeue();
+                    while(!buckets[k].isEmpty()) {                      //Dumps buckets back into array
+                        dataSet[j] = buckets[k].dequeue();
                         j++;
                     }
                 }
             }
-            for(Entry entry: unsortedData) {
-                System.out.println(entry.key);
-            }
         }
-
-
-
-
-        return sortedData;
+        System.out.println("Sorted data:");                                 //Remove these 2 lines after testing
+        System.out.println("-------------------------------------");
+        return dataSet;
     }
 
     Entry[] getData(String fileName) throws FileNotFoundException{
@@ -298,21 +293,21 @@ class Radix {
         Scanner sc = new Scanner(file);
         sc.useDelimiter(",");
 
-        numKeyDigits = Integer.parseInt(sc.nextLine());
-        System.out.println("Key Digit Length: " + numKeyDigits);
+        System.out.println("Unsorted data from file:");                     //Remove these 2 lines after testing
+        System.out.println("-------------------------------------");
 
+        numKeyDigits = Integer.parseInt(sc.nextLine());
         numItems = Integer.parseInt(sc.nextLine());
-        System.out.println("Number of items: " + numItems);
         Entry[] unsortedData = new Entry[numItems];
 
         for(int i = 0; i < numItems; i++) {
             String key = sc.next();
-            String value = sc.nextLine().substring(1);
+            String value = sc.nextLine().substring(1);                      //Removes delimiting comma from value
 
             unsortedData[i] = new Entry(key, value);
-            System.out.print(unsortedData[i].key + " - " + unsortedData[i].value + "\n");
+            System.out.println(unsortedData[i].key + " - " + unsortedData[i].value);        //Remove this line after testing
         }
-
+        System.out.println("");
         return unsortedData;
     }
 }
